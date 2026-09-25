@@ -6,6 +6,13 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). V
 
 ### Añadido
 - Licencia MIT.
+- `AudioTracker.exe` autónomo: la SoundFont va dentro del ejecutable, así que basta con descargarlo y hacer doble clic. Se publica solo en *Releases* al subir una etiqueta `vX.Y.Z`.
+
+### Cambiado
+- La SoundFont GeneralUser GS está en el repositorio: `scripts\setup.ps1` ya no descarga nada y es opcional.
+
+### Corregido
+- Si la app no podía arrancar (por ejemplo, sin SoundFont), se cerraba sin decir nada. Ahora muestra el error en un cuadro de diálogo.
 
 ## [0.1.0] - 2026-09-25
 

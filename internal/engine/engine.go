@@ -5,6 +5,7 @@ package engine
 import (
 	"errors"
 	"fmt"
+	"io"
 	"math"
 	"os"
 	"sort"
@@ -111,7 +112,12 @@ func New(soundFontPath string) (*Engine, error) {
 		return nil, fmt.Errorf("no se encontró la SoundFont: %w", err)
 	}
 	defer f.Close()
-	sf, err := meltysynth.NewSoundFont(f)
+	return NewFromReader(f)
+}
+
+// NewFromReader loads the SoundFont from r, e.g. one embedded in the binary.
+func NewFromReader(r io.Reader) (*Engine, error) {
+	sf, err := meltysynth.NewSoundFont(r)
 	if err != nil {
 		return nil, fmt.Errorf("SoundFont inválida: %w", err)
 	}

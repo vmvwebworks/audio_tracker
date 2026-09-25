@@ -3,45 +3,36 @@
 package main
 
 import (
-	"log"
+	"bytes"
 	"os"
-	"path/filepath"
 
 	"gioui.org/app"
+	"golang.org/x/sys/windows"
 
 	"github.com/vmvwebworks/audio_tracker/internal/engine"
 	"github.com/vmvwebworks/audio_tracker/internal/ui"
 )
 
-const soundFont = "GeneralUser-GS.sf2"
+// version is set at build time by scripts/release.ps1 (-X main.version=...).
+var version = "dev"
 
-func findSoundFont() string {
-	var dirs []string
-	if exe, err := os.Executable(); err == nil {
-		dirs = append(dirs, filepath.Dir(exe))
-	}
-	if wd, err := os.Getwd(); err == nil {
-		dirs = append(dirs, wd)
-	}
-	for _, d := range dirs {
-		for _, p := range []string{filepath.Join(d, "assets", soundFont), filepath.Join(d, soundFont)} {
-			if _, err := os.Stat(p); err == nil {
-				return p
-			}
-		}
-	}
-	return filepath.Join("assets", soundFont)
+// fatal shows an error dialog: the app has no console to print to.
+func fatal(err error) {
+	text, _ := windows.UTF16PtrFromString(err.Error())
+	caption, _ := windows.UTF16PtrFromString("Audio Tracker " + version)
+	windows.MessageBox(0, text, caption, windows.MB_OK|windows.MB_ICONERROR)
+	os.Exit(1)
 }
 
 func main() {
-	eng, err := engine.New(findSoundFont())
+	eng, err := engine.NewFromReader(bytes.NewReader(embeddedSoundFont))
 	if err != nil {
-		log.Fatal(err)
+		fatal(err)
 	}
 	cfg := ui.LoadConfig()
 	go func() {
 		if err := ui.Run(eng, cfg); err != nil {
-			log.Println(err)
+			fatal(err)
 		}
 		os.Exit(0)
 	}()
