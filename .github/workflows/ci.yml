@@ -9,12 +9,12 @@ jobs:
   check:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
       - name: Cache SoundFont
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: assets/GeneralUser-GS.sf2
           key: soundfont-${{ hashFiles('scripts/setup.ps1') }}
@@ -29,7 +29,7 @@ jobs:
     if: github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'sin-changelog')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Code changes need a CHANGELOG entry
