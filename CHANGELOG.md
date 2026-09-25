@@ -4,6 +4,9 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). V
 
 ## [Sin publicar]
 
+### Añadido
+- Licencia MIT.
+
 ## [0.1.0] - 2026-09-25
 
 Primera versión.
