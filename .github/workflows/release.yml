@@ -1,19 +1,33 @@
 name: Release
 
-# Pushing a tag such as v0.2.0 builds AudioTracker.exe (SoundFont embedded)
-# and publishes it on the GitHub Releases page, where users download it.
+# Builds AudioTracker.exe (SoundFont embedded) and attaches it to the GitHub
+# release, where users download it. It runs however the release is made:
+# - creating a release on the GitHub website (any tag name, e.g. 1.2), or
+# - pushing a tag with git (any name); the release is created if missing.
 on:
   push:
-    tags: ['v*']
+    tags: ['*']
+  release:
+    types: [published]
 
 permissions:
   contents: write
 
+# Both events can fire for the same release; run them one after the other.
+concurrency:
+  group: release-${{ github.event.release.tag_name || github.ref_name }}
+  cancel-in-progress: false
+
 jobs:
   release:
     runs-on: windows-latest
+    env:
+      TAG: ${{ github.event.release.tag_name || github.ref_name }}
+      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.TAG }}
       - uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
@@ -22,16 +36,18 @@ jobs:
         run: scripts/check.ps1
       - name: Build AudioTracker.exe
         shell: pwsh
-        run: scripts/release.ps1 -Version "${{ github.ref_name }}"
-      - name: Publish release
+        run: scripts/release.ps1 -Version "$env:TAG"
+      - name: Attach to the release
         shell: pwsh
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
-          $tag = "${{ github.ref_name }}"
-          $notes = @"
+          gh release view $env:TAG *> $null
+          if ($LASTEXITCODE -eq 0) {
+            gh release upload $env:TAG dist/AudioTracker.exe --clobber
+          } else {
+            $notes = @"
           **Descarga ``AudioTracker.exe``, haz doble clic y listo.** No hace falta instalar nada más que un driver ASIO (por ejemplo [ASIO4ALL](https://asio4all.org)).
 
           La primera vez, Windows puede avisar de que es una aplicación desconocida: pulsa *Más información* → *Ejecutar de todas formas*.
           "@
-          gh release create $tag dist/AudioTracker.exe --title "Audio Tracker $tag" --notes "$notes" --generate-notes
+            gh release create $env:TAG dist/AudioTracker.exe --title "Audio Tracker $env:TAG" --notes "$notes" --generate-notes
+          }

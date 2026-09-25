@@ -4,9 +4,14 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). V
 
 ## [Sin publicar]
 
+### Corregido
+- El `.exe` no se adjuntaba si la versión se creaba desde la web de GitHub o con una etiqueta sin `v` (como `1.1`). Ahora se genera con cualquier etiqueta.
+
+## [1.1] - 2026-09-25
+
 ### Añadido
 - Licencia MIT.
-- `AudioTracker.exe` autónomo: la SoundFont va dentro del ejecutable, así que basta con descargarlo y hacer doble clic. Se publica solo en *Releases* al subir una etiqueta `vX.Y.Z`.
+- `AudioTracker.exe` autónomo: la SoundFont va dentro del ejecutable, así que basta con descargarlo y hacer doble clic. Se adjunta solo a cada versión que se publica en *Releases*.
 
 ### Cambiado
 - La SoundFont GeneralUser GS está en el repositorio: `scripts\setup.ps1` ya no descarga nada y es opcional.
