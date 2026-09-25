@@ -20,5 +20,4 @@ Ideas y pendientes, sin orden estricto. Al empezar una, abre un issue o PR. Al t
 - Sincronización con el tema en varios puntos (tempo variable).
 
 ## Distribución
-- Un solo `.exe` con la SoundFont incluida.
 - Botón "Copiar información del sistema" para diagnosticar problemas.

@@ -4,7 +4,7 @@
 
 | Paquete | Responsabilidad | Archivos clave |
 |---|---|---|
-| `main.go` | Busca la SoundFont, crea el motor y lanza la UI | |
+| `main.go` | Crea el motor con la SoundFont incluida en el ejecutable y lanza la UI; los errores de arranque salen en un cuadro de diálogo | `soundfont.go` |
 | `internal/asio` | Host ASIO en Go puro: carga el driver COM y llama a la vtable `IASIO` con `syscall` | `asio.go` |
 | `internal/gp` | Parser de GP7/8, despliegue de repeticiones, mapa de tempo y eventos MIDI | `parse.go`, `timeline.go`, `model.go` |
 | `internal/engine` | Audio en tiempo real: sintetizador, secuenciador, mezcla, grabación y E/S de WAV/MP3 | `engine.go`, `recorder.go`, `wav*.go`, `audio.go` |

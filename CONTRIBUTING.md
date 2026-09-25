@@ -3,7 +3,7 @@
 ## Preparar el entorno
 
 ```powershell
-scripts\setup.ps1   # una vez: SoundFont y dependencias
+scripts\setup.ps1   # opcional: comprueba Go y la SoundFont, y descarga los módulos
 scripts\check.ps1   # antes de cada commit: formato, vet, tests, compilación
 ```
 
@@ -43,5 +43,8 @@ Criterio: la documentación describe cómo está el proyecto **ahora**, no la hi
 
 ## Publicar una versión
 
-1. Mueve lo de *Sin publicar* del CHANGELOG a una sección con número y fecha.
-2. `git tag vX.Y.Z` y `git push --tags`.
+1. En un PR, mueve lo de *Sin publicar* del CHANGELOG a una sección con número y fecha, y fusiónalo.
+2. Desde `main` actualizado: `git tag vX.Y.Z` y `git push origin vX.Y.Z`.
+3. El flujo *Release* de GitHub pasa las comprobaciones, genera `AudioTracker.exe` (con `scripts\release.ps1`) y lo publica en [Releases](https://github.com/vmvwebworks/audio_tracker/releases). Ese es el enlace que se pasa a los usuarios.
+
+Para probar el ejecutable de usuario en local: `scripts\release.ps1` y abre `dist\AudioTracker.exe`.

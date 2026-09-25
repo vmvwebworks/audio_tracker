@@ -17,13 +17,12 @@ func Root() string {
 	return filepath.Join(filepath.Dir(file), "..", "..")
 }
 
-// SoundFont returns the SoundFont path, skipping the test if it has not been
-// downloaded (run scripts/setup.ps1).
+// SoundFont returns the path of the SoundFont versioned in assets/.
 func SoundFont(t testing.TB) string {
 	t.Helper()
 	p := filepath.Join(Root(), "assets", "GeneralUser-GS.sf2")
 	if _, err := os.Stat(p); err != nil {
-		t.Skip("falta assets/GeneralUser-GS.sf2: ejecuta scripts/setup.ps1")
+		t.Fatalf("falta assets/GeneralUser-GS.sf2 (está en el repositorio): %v", err)
 	}
 	return p
 }

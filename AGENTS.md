@@ -10,7 +10,8 @@ Windows desktop app in pure Go (no cgo): plays Guitar Pro 7/8 scores with a Soun
 
 | Task | Command |
 |---|---|
-| First-time setup (SoundFont + modules) | `scripts\setup.ps1` |
+| Optional setup check (Go, SoundFont hash, modules) | `scripts\setup.ps1` |
+| Build the user executable (`dist\AudioTracker.exe`) | `scripts\release.ps1` |
 | Everything CI runs (gofmt, vet, test, build) | `scripts\check.ps1` |
 | Run the app in an isolated sandbox | `scripts\run.ps1 -Sandbox` (prints the PID) |
 | Screenshot / click / type in a window | `scripts\ui.ps1 -ProcessId <PID> -Action shot -Out x.png` |
@@ -25,9 +26,10 @@ Always run `scripts\check.ps1` before saying a change is done, and report its re
 3. **No cgo, Windows only.** System calls go through `golang.org/x/sys/windows`.
 4. **Persistent formats** (`config.json`, `tomas.json`, `proyecto.json`, WAV/BWF): add fields, never rename or remove. Old files must keep loading.
 5. **Language**: UI strings and docs in Spanish; code, comments and identifiers in English.
-6. **Never commit** `assets/*.sf2`, `*.exe`, `*.wav` or personal files (see `.gitignore`).
+6. **Never commit** `*.exe`, `*.wav`, other SoundFonts or personal files (see `.gitignore`). The one exception is `assets/GeneralUser-GS.sf2`: it is versioned and embedded in every build (`soundfont.go`), so the `.exe` works on its own.
 7. **Keep `.ps1` scripts ASCII.** Windows PowerShell 5.1 misreads UTF-8 without a BOM.
 8. **Never push to `main`.** Work on a branch (`feat/…`, `fix/…`, `docs/…`) and open a pull request; it is merged by squash once CI is green. GitHub enforces this: `main` rejects direct pushes and requires the `check` and `changelog` checks.
+9. **Users only get the `.exe`.** Anything a user needs must work from `AudioTracker.exe` with a double click: no scripts, no extra files, errors shown in a dialog. Releases are built by the `Release` workflow when a `v*` tag is pushed.
 
 ## Verifying UI changes
 

@@ -1,5 +1,5 @@
 # Comprobaciones que tienen que pasar antes de cada commit o PR (las mismas
-# que ejecuta el CI): formato, vet, tests y compilación.
+# que ejecuta el CI): formato, vet, tests y compilacion.
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
 Set-Location $root

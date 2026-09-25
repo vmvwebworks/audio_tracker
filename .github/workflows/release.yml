@@ -1,0 +1,37 @@
+name: Release
+
+# Pushing a tag such as v0.2.0 builds AudioTracker.exe (SoundFont embedded)
+# and publishes it on the GitHub Releases page, where users download it.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+      - name: Check (gofmt, vet, test, build)
+        shell: pwsh
+        run: scripts/check.ps1
+      - name: Build AudioTracker.exe
+        shell: pwsh
+        run: scripts/release.ps1 -Version "${{ github.ref_name }}"
+      - name: Publish release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $notes = @"
+          **Descarga ``AudioTracker.exe``, haz doble clic y listo.** No hace falta instalar nada más que un driver ASIO (por ejemplo [ASIO4ALL](https://asio4all.org)).
+
+          La primera vez, Windows puede avisar de que es una aplicación desconocida: pulsa *Más información* → *Ejecutar de todas formas*.
+          "@
+          gh release create $tag dist/AudioTracker.exe --title "Audio Tracker $tag" --notes "$notes" --generate-notes

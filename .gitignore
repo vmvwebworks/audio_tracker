@@ -3,8 +3,9 @@
 *.exe.old
 *.old.exe
 
-# Downloaded by scripts/setup.ps1
+# SoundFonts: only the bundled one (embedded in the .exe) is versioned
 assets/*.sf2
+!assets/GeneralUser-GS.sf2
 
 # Audio produced while testing
 *.wav
@@ -17,3 +18,6 @@ futuros prompts.txt
 .vscode/
 .idea/
 Thumbs.db
+
+# Release builds (scripts/release.ps1)
+dist/

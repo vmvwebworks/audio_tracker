@@ -13,11 +13,6 @@ jobs:
       - uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
-      - name: Cache SoundFont
-        uses: actions/cache@v6
-        with:
-          path: assets/GeneralUser-GS.sf2
-          key: soundfont-${{ hashFiles('scripts/setup.ps1') }}
       - name: Setup
         shell: pwsh
         run: scripts/setup.ps1

@@ -1,5 +1,11 @@
 # Manual de uso
 
+## Instalar
+
+Descarga `AudioTracker.exe` de la [última versión](https://github.com/vmvwebworks/audio_tracker/releases/latest) y haz doble clic: no se instala nada más. Guárdalo donde quieras (por ejemplo en el Escritorio). Si Windows avisa de que es una aplicación desconocida, pulsa *Más información* → *Ejecutar de todas formas*.
+
+Necesitas un driver ASIO para tu tarjeta de sonido; si no tiene uno propio, usa [ASIO4ALL](https://asio4all.org).
+
 ## Primeros pasos
 
 1. **Abrir** (icono de carpeta): carga una partitura `.gp` de Guitar Pro 7/8. La app recuerda la última que abriste.
