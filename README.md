@@ -25,7 +25,7 @@ scripts\run.ps1 -Sandbox   # igual, con configuración temporal y partitura de p
 scripts\release.ps1        # genera dist\AudioTracker.exe, el que se publica
 ```
 
-Si PowerShell bloquea los scripts: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`. Al subir una etiqueta `vX.Y.Z`, GitHub compila y publica el `.exe` solo (ver [CONTRIBUTING.md](CONTRIBUTING.md#publicar-una-versión)).
+Si PowerShell bloquea los scripts: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`. Al crear una versión en GitHub (desde la web o subiendo una etiqueta, con cualquier nombre), GitHub compila el `.exe` y lo adjunta solo (ver [CONTRIBUTING.md](CONTRIBUTING.md#publicar-una-versión)).
 
 ## Documentación
 

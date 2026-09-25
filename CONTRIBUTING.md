@@ -44,7 +44,9 @@ Criterio: la documentación describe cómo está el proyecto **ahora**, no la hi
 ## Publicar una versión
 
 1. En un PR, mueve lo de *Sin publicar* del CHANGELOG a una sección con número y fecha, y fusiónalo.
-2. Desde `main` actualizado: `git tag vX.Y.Z` y `git push origin vX.Y.Z`.
-3. El flujo *Release* de GitHub pasa las comprobaciones, genera `AudioTracker.exe` (con `scripts\release.ps1`) y lo publica en [Releases](https://github.com/vmvwebworks/audio_tracker/releases). Ese es el enlace que se pasa a los usuarios.
+2. Crea la versión, de una de estas dos formas (el nombre de la etiqueta es libre: `1.2`, `v1.2`…):
+   - En la web: *Releases* → *Draft a new release*, etiqueta nueva sobre `main`, *Publish release*.
+   - Con git, desde `main` actualizado: `git tag 1.2` y `git push origin 1.2` (la versión se crea sola).
+3. El flujo *Release* de GitHub pasa las comprobaciones, genera `AudioTracker.exe` (con `scripts\release.ps1`) y lo adjunta a la versión en [Releases](https://github.com/vmvwebworks/audio_tracker/releases). Tarda unos 3 minutos: hasta entonces la versión solo muestra el código fuente. Ese es el enlace que se pasa a los usuarios.
 
 Para probar el ejecutable de usuario en local: `scripts\release.ps1` y abre `dist\AudioTracker.exe`.

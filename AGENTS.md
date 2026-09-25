@@ -29,7 +29,7 @@ Always run `scripts\check.ps1` before saying a change is done, and report its re
 6. **Never commit** `*.exe`, `*.wav`, other SoundFonts or personal files (see `.gitignore`). The one exception is `assets/GeneralUser-GS.sf2`: it is versioned and embedded in every build (`soundfont.go`), so the `.exe` works on its own.
 7. **Keep `.ps1` scripts ASCII.** Windows PowerShell 5.1 misreads UTF-8 without a BOM.
 8. **Never push to `main`.** Work on a branch (`feat/…`, `fix/…`, `docs/…`) and open a pull request; it is merged by squash once CI is green. GitHub enforces this: `main` rejects direct pushes and requires the `check` and `changelog` checks.
-9. **Users only get the `.exe`.** Anything a user needs must work from `AudioTracker.exe` with a double click: no scripts, no extra files, errors shown in a dialog. Releases are built by the `Release` workflow when a `v*` tag is pushed.
+9. **Users only get the `.exe`.** Anything a user needs must work from `AudioTracker.exe` with a double click: no scripts, no extra files, errors shown in a dialog. Releases are built by the `Release` workflow whenever a release is published on GitHub or any tag is pushed.
 
 ## Verifying UI changes
 

@@ -1,6 +1,6 @@
 # Builds the executable for users: dist\AudioTracker.exe. The SoundFont is
 # embedded, so it runs with a double click and nothing else.
-# The GitHub "Release" workflow runs this same script when a v* tag is pushed.
+# The GitHub "Release" workflow runs this same script for every release.
 param([string]$Version = "dev")
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
