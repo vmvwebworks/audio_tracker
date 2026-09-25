@@ -26,7 +26,7 @@ Always run `scripts\check.ps1` before saying a change is done, and report its re
 4. **Persistent formats** (`config.json`, `tomas.json`, `proyecto.json`, WAV/BWF): add fields, never rename or remove. Old files must keep loading.
 5. **Language**: UI strings and docs in Spanish; code, comments and identifiers in English.
 6. **Never commit** `assets/*.sf2`, `*.exe`, `*.wav` or personal files (see `.gitignore`).
-7. **Keep `.ps1` scripts ASCII.** Windows PowerShell 5.1 misreads UTF-8 without a BOM.
+. **Never push to `main`.** Work on a branch (`feat/…`, `fix/…`, `docs/…`) and open a pull request; it is merged by squash once CI is green. `main` is not technically protected (free private repo), so this rule is on you; CI flags direct pushes.
 
 ## Verifying UI changes
 

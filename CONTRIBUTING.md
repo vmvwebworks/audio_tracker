@@ -14,6 +14,8 @@ scripts\check.ps1   # antes de cada commit: formato, vet, tests, compilación
 3. Pasa `scripts\check.ps1` y prueba la app con `scripts\run.ps1 -Sandbox`.
 4. Abre un PR hacia `main`. La plantilla trae la lista de comprobación. El CI repite las comprobaciones y exige que se actualice `CHANGELOG.md` cuando cambia el código.
 
+No subas nunca directamente a `main`. GitHub no permite protegerla en un repositorio privado gratuito, así que es una norma del equipo: el CI marca en rojo cualquier commit que llegue a `main` sin PR. Los PR se fusionan con *squash* (un commit por PR) y la rama se borra sola.
+
 Commits pequeños y con mensaje claro, en español o en inglés. Formato recomendado: `feat: tomas favoritas`, `fix: cursor en la intro`.
 
 ## Qué documentar en cada cambio

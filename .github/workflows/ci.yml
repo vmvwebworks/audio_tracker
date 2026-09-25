@@ -42,3 +42,22 @@ jobs:
             echo "$code"
             exit 1
           fi
+
+  # main can't be protected on a free private repo, so at least flag commits
+  # that reached it without a pull request.
+  via-pr:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Changes reach main through a PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          n=$(gh api "repos/${{ github.repository }}/commits/${{ github.sha }}/pulls" --jq length)
+          if [ "$n" = "0" ]; then
+            echo "::error::Push directo a main sin PR (${{ github.sha }}). Trabaja en una rama y abre un PR: ver CONTRIBUTING.md."
+            exit 1
+          fi
