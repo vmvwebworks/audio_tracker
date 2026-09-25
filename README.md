@@ -35,3 +35,7 @@ Si PowerShell bloquea los scripts: `Set-ExecutionPolicy -Scope CurrentUser Remot
 - Interfaz: [Gio](https://gioui.org). Síntesis: [go-meltysynth](https://github.com/sinshu/go-meltysynth). MP3: [go-mp3](https://github.com/hajimehoshi/go-mp3).
 - Sonidos: SoundFont [GeneralUser GS](https://github.com/mrbumpy409/GeneralUser-GS) de S. Christian Collins. No se incluye en el repositorio: la descarga `scripts\setup.ps1`.
 - Guitar Pro es una marca de Arobas Music; este proyecto no está afiliado a ella.
+
+## Licencia
+
+[MIT](LICENSE). La SoundFont GeneralUser GS tiene su propia licencia: consúltala en [su repositorio](https://github.com/mrbumpy409/GeneralUser-GS).
