@@ -1,0 +1,19 @@
+# Binaries
+*.exe
+*.exe.old
+*.old.exe
+
+# Downloaded by scripts/setup.ps1
+assets/*.sf2
+
+# Audio produced while testing
+*.wav
+*.mp3
+
+# Personal notes
+futuros prompts.txt
+
+# Editors / OS
+.vscode/
+.idea/
+Thumbs.db

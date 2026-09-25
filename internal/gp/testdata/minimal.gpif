@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Minimal Guitar Pro 7/8 score used by the tests (see testdata/README.md).
+  Playback order after repeats: bars 1 2 3 2 3 4 5 at 100 bpm.
+-->
+<GPIF>
+<Score>
+<Title><![CDATA[Prueba mínima]]></Title>
+<Artist><![CDATA[audio_tracker]]></Artist>
+</Score>
+<MasterTrack>
+<Tracks>0 1</Tracks>
+<Automations>
+<Automation><Type>Tempo</Type><Linear>false</Linear><Bar>0</Bar><Position>0</Position><Value>100 2</Value></Automation>
+</Automations>
+</MasterTrack>
+<Tracks>
+<Track id="0">
+<Name><![CDATA[Guitarra]]></Name>
+<ShortName><![CDATA[Guit.]]></ShortName>
+<RSE><ChannelStrip version="E56"><Parameters>0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0 0.5 0.5 0.8 0.5 0.5 0.5</Parameters></ChannelStrip></RSE>
+<Sounds><Sound><MIDI><LSB>0</LSB><MSB>0</MSB><Program>29</Program></MIDI></Sound></Sounds>
+<MidiConnection><Port>0</Port><PrimaryChannel>0</PrimaryChannel></MidiConnection>
+<Staves><Staff><Properties>
+<Property name="CapoFret"><Fret>0</Fret></Property>
+<Property name="Tuning"><Pitches>40 45 50 55 59 64</Pitches></Property>
+</Properties></Staff></Staves>
+</Track>
+<Track id="1">
+<Name><![CDATA[Batería]]></Name>
+<InstrumentSet>
+<Name>Drums</Name>
+<Type>drumKit</Type>
+<Elements>
+<Element><Name>Kick</Name><Articulations>
+<Articulation><Name>Kick (hit)</Name><StaffLine>7</StaffLine><Noteheads>noteheadBlack noteheadHalf noteheadWhole</Noteheads><OutputMidiNumber>36</OutputMidiNumber></Articulation>
+</Articulations></Element>
+<Element><Name>Snare</Name><Articulations>
+<Articulation><Name>Snare (hit)</Name><StaffLine>3</StaffLine><Noteheads>noteheadBlack noteheadHalf noteheadWhole</Noteheads><OutputMidiNumber>38</OutputMidiNumber></Articulation>
+</Articulations></Element>
+</Elements>
+</InstrumentSet>
+<Sounds><Sound><MIDI><LSB>0</LSB><MSB>0</MSB><Program>0</Program></MIDI></Sound></Sounds>
+<MidiConnection><Port>0</Port><PrimaryChannel>9</PrimaryChannel></MidiConnection>
+<Staves><Staff><Properties>
+<Property name="Tuning"><Pitches>0 0 0 0 0 0</Pitches></Property>
+</Properties></Staff></Staves>
+</Track>
+</Tracks>
+<MasterBars>
+<MasterBar><Time>4/4</Time><Bars>0 1</Bars></MasterBar>
+<MasterBar><Time>4/4</Time><Repeat start="true" end="false" count="2" /><Section><Letter>A</Letter><Text>Estribillo</Text></Section><Bars>2 3</Bars></MasterBar>
+<MasterBar><Time>4/4</Time><Repeat start="false" end="true" count="2" /><Bars>4 5</Bars></MasterBar>
+<MasterBar><Time>3/4</Time><Bars>6 7</Bars></MasterBar>
+<MasterBar><Time>4/4</Time><Bars>8 9</Bars></MasterBar>
+</MasterBars>
+<Bars>
+<Bar id="0"><Clef>G2</Clef><Voices>0 -1 -1 -1</Voices></Bar>
+<Bar id="1"><Clef>Neutral</Clef><Voices>1 -1 -1 -1</Voices></Bar>
+<Bar id="2"><Clef>G2</Clef><Voices>0 -1 -1 -1</Voices></Bar>
+<Bar id="3"><Clef>Neutral</Clef><Voices>1 -1 -1 -1</Voices></Bar>
+<Bar id="4"><Clef>G2</Clef><Voices>0 -1 -1 -1</Voices></Bar>
+<Bar id="5"><Clef>Neutral</Clef><Voices>1 -1 -1 -1</Voices></Bar>
+<Bar id="6"><Clef>G2</Clef><Voices>2 -1 -1 -1</Voices></Bar>
+<Bar id="7"><Clef>Neutral</Clef><Voices>3 -1 -1 -1</Voices></Bar>
+<Bar id="8"><Clef>G2</Clef><Voices>4 -1 -1 -1</Voices></Bar>
+<Bar id="9"><Clef>Neutral</Clef><Voices>1 -1 -1 -1</Voices></Bar>
+</Bars>
+<Voices>
+<Voice id="0"><Beats>0 1 0 1</Beats></Voice>
+<Voice id="1"><Beats>4 5 4 5</Beats></Voice>
+<Voice id="2"><Beats>0 1 0</Beats></Voice>
+<Voice id="3"><Beats>4 5 5</Beats></Voice>
+<Voice id="4"><Beats>2 3</Beats></Voice>
+</Voices>
+<Beats>
+<Beat id="0"><Dynamic>MF</Dynamic><Rhythm ref="0" /><Notes>0</Notes></Beat>
+<Beat id="1"><Dynamic>F</Dynamic><Rhythm ref="0" /><Notes>1</Notes></Beat>
+<Beat id="2"><Dynamic>MF</Dynamic><Rhythm ref="1" /><Notes>2</Notes></Beat>
+<Beat id="3"><Dynamic>MF</Dynamic><Rhythm ref="1" /><Notes>3</Notes></Beat>
+<Beat id="4"><Dynamic>MF</Dynamic><Rhythm ref="0" /><Notes>4</Notes></Beat>
+<Beat id="5"><Dynamic>MF</Dynamic><Rhythm ref="0" /><Notes>5</Notes></Beat>
+</Beats>
+<Notes>
+<Note id="0"><Properties><Property name="Fret"><Fret>3</Fret></Property><Property name="String"><String>0</String></Property><Property name="Midi"><Number>43</Number></Property></Properties></Note>
+<Note id="1"><Properties><Property name="Fret"><Fret>0</Fret></Property><Property name="String"><String>5</String></Property></Properties></Note>
+<Note id="2"><Tie origin="true" destination="false" /><Properties><Property name="Fret"><Fret>2</Fret></Property><Property name="String"><String>2</String></Property></Properties></Note>
+<Note id="3"><Tie origin="false" destination="true" /><Properties><Property name="Fret"><Fret>2</Fret></Property><Property name="String"><String>2</String></Property></Properties></Note>
+<Note id="4"><InstrumentArticulation>0</InstrumentArticulation><Properties><Property name="Midi"><Number>36</Number></Property></Properties></Note>
+<Note id="5"><InstrumentArticulation>1</InstrumentArticulation><Properties><Property name="Midi"><Number>38</Number></Property></Properties></Note>
+</Notes>
+<Rhythms>
+<Rhythm id="0"><NoteValue>Quarter</NoteValue></Rhythm>
+<Rhythm id="1"><NoteValue>Half</NoteValue></Rhythm>
+</Rhythms>
+</GPIF>

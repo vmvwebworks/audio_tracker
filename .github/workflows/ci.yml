@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Cache SoundFont
+        uses: actions/cache@v4
+        with:
+          path: assets/GeneralUser-GS.sf2
+          key: soundfont-${{ hashFiles('scripts/setup.ps1') }}
+      - name: Setup
+        shell: pwsh
+        run: scripts/setup.ps1
+      - name: Check (gofmt, vet, test, build)
+        shell: pwsh
+        run: scripts/check.ps1
+
+  changelog:
+    if: github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'sin-changelog')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Code changes need a CHANGELOG entry
+        run: |
+          base="origin/${{ github.base_ref }}"
+          changed=$(git diff --name-only "$base"...HEAD)
+          code=$(echo "$changed" | grep -E '\.go$' | grep -v '_test\.go$' || true)
+          if [ -n "$code" ] && ! echo "$changed" | grep -qx 'CHANGELOG.md'; then
+            echo "::error::Este PR cambia código Go pero no CHANGELOG.md. Añade una línea en «Sin publicar» (y actualiza docs/ si corresponde). Si de verdad no hace falta, pon la etiqueta sin-changelog."
+            echo "$code"
+            exit 1
+          fi
