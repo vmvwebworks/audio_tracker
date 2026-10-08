@@ -69,6 +69,9 @@ type App struct {
 	tab      *TabView
 
 	btnOpen, btnPlay, btnStop, btnRec, btnMetro, btnMon, btnTake, btnFollow widget.Clickable
+	btnTuner                                                                widget.Clickable
+	btnZoomOut, btnZoomIn                                                   widget.Clickable
+	tn                                                                      tunerUI
 	btnArm, btnIn2, btnFolder                                               widget.Clickable
 	gain                                                                    widget.Float
 	lastGain                                                                float32
@@ -113,6 +116,8 @@ func Run(eng *engine.Engine, cfg *Config) error {
 		trackList: layout.List{Axis: layout.Vertical},
 	}
 	a.focused = true
+	a.tn.sel = -1
+	a.tab.Zoom = a.zoom()
 	eng.SetMetronome(cfg.Metronome)
 	eng.SetInputGain(cfg.InputGainDb)
 	a.gain.Value = float32(cfg.InputGainDb / maxGainDb)
@@ -449,12 +454,14 @@ drain:
 	a.inLevel = max(a.eng.InputPeak(), a.inLevel*0.9)
 	a.outLevel = max(a.eng.OutputPeak(), a.outLevel*0.9)
 
+	a.updateTuner(gtx.Now)
 	a.handleInput(gtx)
 
 	paint.Fill(gtx.Ops, colBg)
 	layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 		layout.Rigid(a.toolbar),
 		layout.Rigid(a.deviceBar),
+		layout.Rigid(a.tunerBar),
 		layout.Flexed(1, a.body),
 		layout.Rigid(a.statusBar),
 	)
@@ -503,6 +510,7 @@ func (a *App) handleInput(gtx C) {
 	click := func(c *widget.Clickable) bool { return c.Clicked(gtx) }
 	a.handleTakes(gtx)
 	a.handleBacking(gtx)
+	a.handleTuner(gtx)
 	if click(&a.btnOpen) && !a.dialogOpen && !a.eng.Recording() {
 		a.dialogOpen = true
 		initial := a.cfg.LastFile
@@ -552,6 +560,15 @@ func (a *App) handleInput(gtx C) {
 	}
 	if click(&a.btnFollow) {
 		a.tab.Follow = !a.tab.Follow
+	}
+	if click(&a.btnZoomOut) {
+		a.stepZoom(-1)
+	}
+	if click(&a.btnZoomIn) {
+		a.stepZoom(1)
+	}
+	if click(&a.btnTuner) {
+		a.setTuner(!a.tn.on)
 	}
 	if click(&a.btnDriver) && !a.panelOpen && !a.eng.Playing() {
 		drivers := a.eng.Drivers()
@@ -677,6 +694,21 @@ func (a *App) toolbar(gtx C) D {
 			}),
 			layout.Rigid(func(gtx C) D {
 				return a.toolIcon(gtx, &a.btnFollow, icFollow, "Seguir cursor", a.tab.Follow, colAccent, none)
+			}),
+			layout.Rigid(func(gtx C) D {
+				return a.toolIcon(gtx, &a.btnTuner, icTuner, "Afinador", a.tn.on, colAccent, none)
+			}),
+			layout.Rigid(layout.Spacer{Width: 10}.Layout),
+			layout.Rigid(func(gtx C) D {
+				return a.toolIcon(gtx, &a.btnZoomOut, icRemove, "Alejar la partitura (ver más compases)", false, colAccent, none)
+			}),
+			layout.Rigid(func(gtx C) D {
+				return layout.Inset{Right: 6}.Layout(gtx, func(gtx C) D {
+					return a.label(gtx, 13, colDim, fmt.Sprintf("%.0f%%", a.zoom()*100))
+				})
+			}),
+			layout.Rigid(func(gtx C) D {
+				return a.toolIcon(gtx, &a.btnZoomIn, icAdd, "Acercar la partitura (ver más grande)", false, colAccent, none)
 			}),
 			layout.Rigid(layout.Spacer{Width: 10}.Layout),
 			layout.Rigid(a.recBadge),
@@ -1088,7 +1120,7 @@ func (a *App) manageBackgroundAudio() {
 	if a.cfg.KeepAudio || a.panelOpen {
 		return
 	}
-	idle := !a.eng.Playing() && !a.eng.Recording() && a.eng.PreviewPosition() < 0 && !a.recArm
+	idle := !a.eng.Playing() && !a.eng.Recording() && a.eng.PreviewPosition() < 0 && !a.recArm && !a.tn.on
 	switch {
 	case !a.focused && idle && !a.suspended && a.eng.Running():
 		a.eng.CloseDriver()

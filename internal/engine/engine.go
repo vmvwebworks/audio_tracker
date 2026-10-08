@@ -49,6 +49,7 @@ type Engine struct {
 	backingLen int64 // samples
 
 	recorder *Recorder
+	tunerQ   *ring // read by the UI goroutine, written by the audio thread
 
 	cmds chan func(*rt)
 	rt   rt
@@ -90,6 +91,7 @@ type rt struct {
 	preview      []float32 // a take being auditioned on its own
 	prevPos      int
 	rec          *Recorder
+	tuner        *ring // input tap for the tuner, nil when it is off
 	master       float32
 	inChan       int
 	outL         int
@@ -617,6 +619,31 @@ func (e *Engine) SetInputGain(db float64) {
 	e.exec(func(r *rt) { r.inGain = g })
 }
 
+// SetTuner starts or stops copying the input (after the input gain) to a
+// queue that TunerRead drains. It does not make the input audible.
+func (e *Engine) SetTuner(on bool) {
+	if !on {
+		e.tunerQ = nil
+		e.exec(func(r *rt) { r.tuner = nil })
+		return
+	}
+	if e.tunerQ != nil {
+		return
+	}
+	q := newRing(1 << 16)
+	e.tunerQ = q
+	e.exec(func(r *rt) { r.tuner = q })
+}
+
+// TunerRead moves the input samples captured since the last call into dst
+// and returns how many it copied. It is for the UI goroutine.
+func (e *Engine) TunerRead(dst []float32) int {
+	if e.tunerQ == nil {
+		return 0
+	}
+	return e.tunerQ.read(dst)
+}
+
 // SetTakePlayback toggles playing back the last take along with the song.
 func (e *Engine) SetTakePlayback(on bool) { e.exec(func(r *rt) { r.takeOn = on }) }
 
@@ -661,6 +688,9 @@ drain:
 			pk = max(pk, float32(math.Abs(float64(v))))
 		}
 		storeMax(&e.inPeak, pk)
+		if r.tuner != nil {
+			r.tuner.write(input)
+		}
 		// Feedback guard: input pinned near full scale while monitoring means the
 		// output is leaking back into the input. Cut the monitor.
 		if r.monitor && pk > 0.9 {

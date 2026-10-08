@@ -2,6 +2,7 @@ package engine
 
 import (
 	"encoding/binary"
+	"math"
 	"os"
 	"path/filepath"
 	"testing"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/vmvwebworks/audio_tracker/internal/gp"
 	"github.com/vmvwebworks/audio_tracker/internal/testutil"
+	"github.com/vmvwebworks/audio_tracker/internal/tuner"
 )
 
 // offline prepares the engine as if a driver were streaming, without one.
@@ -200,5 +202,76 @@ func TestFeedbackGuard(t *testing.T) {
 	feed(0.99, 0.5)
 	if !e.FeedbackTripped() || e.rt.monitor {
 		t.Fatal("el protector no cortó el acople")
+	}
+}
+
+func TestTunerTap(t *testing.T) {
+	e, err := New(testutil.SoundFont(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	const sr, buf = 48000, 256
+	offline(t, e, sr, buf, 0, 0)
+	in := [][]float32{make([]float32, buf)}
+	out := [][]float32{make([]float32, buf), make([]float32, buf)}
+	feed := func(blocks int) {
+		for range blocks {
+			for i := range in[0] {
+				in[0][i] = 0.25
+			}
+			e.process(in, out)
+		}
+	}
+
+	feed(4)
+	if n := e.TunerRead(make([]float32, 4096)); n != 0 {
+		t.Fatalf("con el afinador apagado se leyeron %d muestras", n)
+	}
+	e.SetTuner(true)
+	feed(4)
+	dst := make([]float32, 4096)
+	n := e.TunerRead(dst)
+	if n != 4*buf {
+		t.Fatalf("se leyeron %d muestras, esperadas %d", n, 4*buf)
+	}
+	if dst[0] != 0.25 {
+		t.Errorf("muestra %v, esperada 0.25", dst[0])
+	}
+	e.SetTuner(false)
+	feed(2)
+	if n := e.TunerRead(dst); n != 0 {
+		t.Errorf("tras apagarlo se leyeron %d muestras", n)
+	}
+}
+
+// A tone fed through the input reaches the tuner intact and is recognised.
+func TestTunerPitch(t *testing.T) {
+	e, err := New(testutil.SoundFont(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	const sr, buf = 48000, 512
+	offline(t, e, sr, buf, 0, 0)
+	e.SetTuner(true)
+	in := [][]float32{make([]float32, buf)}
+	out := [][]float32{make([]float32, buf), make([]float32, buf)}
+	const want = 110.0 // open A string
+	k := 0
+	var got []float32
+	for range 12 {
+		for i := range in[0] {
+			in[0][i] = 0.3 * float32(math.Sin(2*math.Pi*want*float64(k)/sr))
+			k++
+		}
+		e.process(in, out)
+		chunk := make([]float32, buf)
+		got = append(got, chunk[:e.TunerRead(chunk)]...)
+	}
+	if len(got) != 12*buf {
+		t.Fatalf("llegaron %d muestras, esperadas %d", len(got), 12*buf)
+	}
+	f, conf := tuner.Detect(got[len(got)-tuner.WindowSize(sr):], sr)
+	if math.Abs(f-want) > 0.2 || conf < 0.9 {
+		t.Errorf("detectado %.2f Hz (confianza %.2f), esperado %.0f", f, conf, want)
 	}
 }
