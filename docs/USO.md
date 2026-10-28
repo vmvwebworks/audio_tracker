@@ -38,6 +38,7 @@ El botón del afinador (a la derecha de *Seguir cursor*) abre una franja bajo la
 La tarjeta **Grabación** es la pista de tu instrumento.
 
 - **REC** (tecla R) arma la pista. Con la pista armada, Reproducir graba.
+- **Cuenta atrás**: antes de grabar suenan 1 o 2 compases de clics, en el compás y el tempo de donde empiezas, para que te dé tiempo a prepararte. Mientras tanto la canción no avanza y no se graba; la insignia muestra *PREPARADO…* con los tiempos que quedan. Se elige con el botón **Cuenta** de la barra superior (no, 1 o 2 compases) y se recuerda. Suena aunque el metrónomo esté apagado, y solo al grabar: para escuchar o repasar tomas no hay cuenta.
 - Si la armas con la canción sonando, empieza a grabar en ese momento (punch-in). Si la desarmas, la toma termina y la canción sigue.
 - El botón de grabar de la barra superior arma y arranca en un solo paso.
 - **Ganancia** (0 a +40 dB): súbela hasta que el nivel llegue a unos −12 dB al tocar fuerte.
@@ -88,7 +89,7 @@ La sincronización se guarda por canción. Con el tema cargado, la línea de tie
 
 | Archivo | Contenido |
 |---|---|
-| `%AppData%\audio_tracker\config.json` | Driver, canales, ganancia, monitor, La y instrumento del afinador, zoom, última partitura… |
+| `%AppData%\audio_tracker\config.json` | Driver, canales, ganancia, monitor, La y instrumento del afinador, zoom, cuenta atrás, última partitura… |
 | `<nombre> - tomas\*.wav` | Tomas (Broadcast WAV) |
 | `<nombre> - tomas\tomas.json` | Favoritas |
 | `<nombre> - tomas\proyecto.json` | Tema cargado y su sincronización |
