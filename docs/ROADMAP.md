@@ -5,7 +5,6 @@ Ideas y pendientes, sin orden estricto. Al empezar una, abre un issue o PR. Al t
 ## Transporte
 - Al pulsar Parar (no Pausa), llevar el foco de la tablatura al inicio de la canción.
 - Botones de "ir al principio" e "ir al final", como en Guitar Pro.
-- Cuenta atrás antes de grabar.
 - Reproducción más lenta para practicar (sin cambiar el tono del tema).
 
 ## Audio

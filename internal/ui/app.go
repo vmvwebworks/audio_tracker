@@ -69,7 +69,7 @@ type App struct {
 	tab      *TabView
 
 	btnOpen, btnPlay, btnStop, btnRec, btnMetro, btnMon, btnTake, btnFollow widget.Clickable
-	btnTuner                                                                widget.Clickable
+	btnTuner, btnCount                                                      widget.Clickable
 	btnZoomOut, btnZoomIn                                                   widget.Clickable
 	tn                                                                      tunerUI
 	btnArm, btnIn2, btnFolder                                               widget.Clickable
@@ -276,7 +276,11 @@ func (a *App) togglePlay() {
 	if a.recArm && !a.startTake() {
 		return
 	}
-	if err := a.eng.Play(); err != nil {
+	bars := 0
+	if a.recArm {
+		bars = a.countIn()
+	}
+	if err := a.eng.PlayCountIn(bars); err != nil {
 		a.eng.StopRecording()
 		a.setStatus(true, "%v", err)
 	}
@@ -340,6 +344,19 @@ func (a *App) recordNow() {
 	if !a.eng.Playing() {
 		a.togglePlay()
 	}
+}
+
+// maxCountIn is the longest count-in, in bars.
+const maxCountIn = 2
+
+// countIn is the count-in before recording, in bars, from the settings.
+func (a *App) countIn() int { return min(max(a.cfg.CountIn, 0), maxCountIn) }
+
+func countInText(bars int) string {
+	if bars == 1 {
+		return "1 compás"
+	}
+	return fmt.Sprintf("%d compases", bars)
 }
 
 func (a *App) inputName() string {
@@ -541,6 +558,15 @@ func (a *App) handleInput(gtx C) {
 		a.eng.SetMetronome(a.cfg.Metronome)
 		_ = a.cfg.Save()
 	}
+	if click(&a.btnCount) {
+		a.cfg.CountIn = (a.countIn() + 1) % (maxCountIn + 1)
+		_ = a.cfg.Save()
+		if a.cfg.CountIn == 0 {
+			a.setStatus(false, "Cuenta atrás desactivada: la grabación empieza al pulsar Reproducir")
+		} else {
+			a.setStatus(false, "Cuenta atrás de %s antes de grabar", countInText(a.cfg.CountIn))
+		}
+	}
 	if click(&a.btnMon) {
 		a.cfg.Monitor = !a.cfg.Monitor
 		a.applyMonitor()
@@ -693,6 +719,13 @@ func (a *App) toolbar(gtx C) D {
 				return a.toolIcon(gtx, &a.btnMetro, icMetro, "Metrónomo", a.cfg.Metronome, colAccent, none)
 			}),
 			layout.Rigid(func(gtx C) D {
+				txt := "Cuenta: no"
+				if n := a.countIn(); n > 0 {
+					txt = fmt.Sprintf("Cuenta: %d", n)
+				}
+				return a.button(gtx, &a.btnCount, txt, a.countIn() > 0, colAccent)
+			}),
+			layout.Rigid(func(gtx C) D {
 				return a.toolIcon(gtx, &a.btnFollow, icFollow, "Seguir cursor", a.tab.Follow, colAccent, none)
 			}),
 			layout.Rigid(func(gtx C) D {
@@ -723,7 +756,10 @@ func (a *App) toolbar(gtx C) D {
 func (a *App) recBadge(gtx C) D {
 	var txt string
 	var bg color.NRGBA
+	counting, beats := a.eng.CountIn()
 	switch {
+	case counting:
+		txt, bg = fmt.Sprintf("PREPARADO…  %d", beats), colAmber
 	case a.eng.Recording():
 		txt, bg = "GRABANDO  "+clock(a.eng.RecordingElapsed()), colRec
 		if !a.eng.Playing() {

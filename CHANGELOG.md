@@ -6,6 +6,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). V
 
 ### Añadido
 - **Afinador**: botón a la derecha de *Seguir cursor*. Detecta la nota que tocas por la entrada de audio (algoritmo YIN, de unos 28 Hz a 1,4 kHz), muestra la nota, la frecuencia y una aguja en cents, y marca las cuerdas de la afinación de la pista seleccionada, que se pueden fijar como objetivo. Se elige el instrumento (pista, guitarra, Drop D, 7 cuerdas, bajo de 4 y 5, ukelele, mandolina/violín, banjo o cromático) y se puede cambiar la nota de cada cuerda (medio tono u octava). La referencia (La = 440 Hz por defecto) se ajusta de 430 a 450 Hz y se guarda en `config.json` (`tuner_a4`, `tuner_instrument`, `tuner_custom`).
+- **Cuenta atrás antes de grabar**: con la pista armada, Reproducir da 1 o 2 compases de clics (en el compás y el tempo de donde empiezas) antes de que arranquen la canción y la toma. Se elige con el botón *Cuenta* de la barra (no, 1 o 2; por defecto 1) y se guarda en `config.json` (`count_in_bars`).
 - **Zoom de la partitura** (− / + en la barra, del 50 % al 250 %), guardado en `config.json` (`zoom`).
 - **Partitura en pentagrama** encima de la tablatura, alineada con ella: clave de Sol, Fa o percusión, armadura (leída del `.gp`), compás, figuras con plicas, corchetes y barras, silencios, puntillos, tresillos, ligaduras, notas de adorno y alteraciones.
 

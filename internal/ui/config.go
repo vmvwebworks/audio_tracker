@@ -30,6 +30,8 @@ type Config struct {
 	TunerCustom     map[string][]int `json:"tuner_custom"`
 	// Zoom is the score magnification; 0 means 1.
 	Zoom float64 `json:"zoom"`
+	// CountIn is the number of bars of clicks before a recording starts.
+	CountIn int `json:"count_in_bars"`
 }
 
 func configPath() string {
@@ -42,7 +44,7 @@ func configPath() string {
 
 // LoadConfig reads the saved settings, returning defaults if there are none.
 func LoadConfig() *Config {
-	c := &Config{Driver: "ASIO4ALL v2", OutL: 0, OutR: 1, TunerA4: 440}
+	c := &Config{Driver: "ASIO4ALL v2", OutL: 0, OutR: 1, TunerA4: 440, CountIn: 1}
 	if b, err := os.ReadFile(configPath()); err == nil {
 		_ = json.Unmarshal(b, c)
 	}
