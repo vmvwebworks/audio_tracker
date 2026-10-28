@@ -49,7 +49,7 @@
 </Tracks>
 <MasterBars>
 <MasterBar><Time>4/4</Time><Bars>0 1</Bars></MasterBar>
-<MasterBar><Time>4/4</Time><Repeat start="true" end="false" count="2" /><Section><Letter>A</Letter><Text>Estribillo</Text></Section><Bars>2 3</Bars></MasterBar>
+<MasterBar><Key><AccidentalCount>2</AccidentalCount><Mode>Major</Mode></Key><Time>4/4</Time><Repeat start="true" end="false" count="2" /><Section><Letter>A</Letter><Text>Estribillo</Text></Section><Bars>2 3</Bars></MasterBar>
 <MasterBar><Time>4/4</Time><Repeat start="false" end="true" count="2" /><Bars>4 5</Bars></MasterBar>
 <MasterBar><Time>3/4</Time><Bars>6 7</Bars></MasterBar>
 <MasterBar><Time>4/4</Time><Bars>8 9</Bars></MasterBar>

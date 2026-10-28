@@ -53,6 +53,9 @@ type MasterBar struct {
 	Section      string
 	TempoChanges []TempoChange
 	TripletFeel  bool
+	// Key is the key signature as a number of accidentals: positive for
+	// sharps, negative for flats, 0 for C major / A minor.
+	Key int
 }
 
 // TempoChange is a tempo automation within a master bar.

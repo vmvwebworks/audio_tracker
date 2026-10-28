@@ -1,6 +1,6 @@
 # Audio Tracker
 
-App de escritorio para Windows que reproduce partituras de **Guitar Pro 7/8** (`.gp`) mostrando la tablatura, mientras **grabas tu instrumento** por ASIO. Puede sonar con el sintetizador o sobre el **tema real** exportado de Reaper, con la partitura sincronizada.
+App de escritorio para Windows que reproduce partituras de **Guitar Pro 7/8** (`.gp`) mostrando el pentagrama y la tablatura, con un **afinador** integrado, mientras **grabas tu instrumento** por ASIO. Puede sonar con el sintetizador o sobre el **tema real** exportado de Reaper, con la partitura sincronizada.
 
 ## Descargar y usar
 

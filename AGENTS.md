@@ -4,7 +4,7 @@ Instructions for AI coding agents working on this repository. Humans: see [CONTR
 
 ## Project
 
-Windows desktop app in pure Go (no cgo): plays Guitar Pro 7/8 scores with a SoundFont synth, shows the tablature, records an instrument through ASIO, and can play along a backing track synced to the score. Read [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) before changing `internal/engine` or anything touching time or positions.
+Windows desktop app in pure Go (no cgo): plays Guitar Pro 7/8 scores with a SoundFont synth, shows staff notation and tablature, tunes and records an instrument through ASIO, and can play along a backing track synced to the score. Read [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) before changing `internal/engine` or anything touching time or positions.
 
 ## Commands (PowerShell, from the repo root)
 

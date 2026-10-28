@@ -36,6 +36,9 @@ var (
 	icRemove     = mustIcon(icons.ContentRemove)
 	icAdd        = mustIcon(icons.ContentAdd)
 	icFlag       = mustIcon(icons.ContentFlag)
+	icTuner      = mustIcon(icons.ImageTune)
+	icPrev       = mustIcon(icons.NavigationChevronLeft)
+	icNext       = mustIcon(icons.NavigationChevronRight)
 )
 
 func mustIcon(data []byte) *widget.Icon {

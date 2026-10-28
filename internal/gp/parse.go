@@ -110,6 +110,9 @@ type xMasterBar struct {
 		Text   string `xml:"Text"`
 	} `xml:"Section"`
 	TripletFeel string `xml:"TripletFeel"`
+	Key         struct {
+		Accidentals int `xml:"AccidentalCount"`
+	} `xml:"Key"`
 }
 
 type xBar struct {
@@ -224,6 +227,7 @@ func (p *parser) build() (*Song, error) {
 		if mb.Section == "" {
 			mb.Section = strings.TrimSpace(xm.Section.Letter)
 		}
+		mb.Key = min(max(xm.Key.Accidentals, -7), 7)
 		mb.TripletFeel = xm.TripletFeel != "" && xm.TripletFeel != "NoTripletFeel"
 		s.MasterBars = append(s.MasterBars, mb)
 

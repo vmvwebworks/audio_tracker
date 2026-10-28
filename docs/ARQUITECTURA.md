@@ -8,11 +8,12 @@
 | `internal/asio` | Host ASIO en Go puro: carga el driver COM y llama a la vtable `IASIO` con `syscall` | `asio.go` |
 | `internal/gp` | Parser de GP7/8, despliegue de repeticiones, mapa de tempo y eventos MIDI | `parse.go`, `timeline.go`, `model.go` |
 | `internal/engine` | Audio en tiempo real: sintetizador, secuenciador, mezcla, grabación y E/S de WAV/MP3 | `engine.go`, `recorder.go`, `wav*.go`, `audio.go` |
-| `internal/ui` | Interfaz con Gio: ventana, tablatura, pistas, tomas y tema | `app.go`, `tab.go`, `takes.go`, `backing.go` |
+| `internal/tuner` | Detección de tono (YIN) y conversión a nota y cents; no depende de nada del proyecto | `tuner.go` |
+| `internal/ui` | Interfaz con Gio: ventana, partitura (pentagrama y tablatura), afinador, pistas, tomas y tema | `app.go`, `tab.go`, `notation.go`, `glyphs.go`, `tunerui.go`, `takes.go`, `backing.go` |
 | `internal/testutil` | Fixtures de test (partitura mínima, SoundFont) | |
 | `cmd/asiotest` | Diagnóstico con el driver real: reproduce y graba 3 s en silencio | |
 
-Dependencias: `ui → engine → gp`, `engine → asio`. `gp` y `asio` no dependen de nada del proyecto.
+Dependencias: `ui → engine → gp`, `engine → asio`, `ui → tuner`. `gp`, `asio` y `tuner` no dependen de nada del proyecto.
 
 ## Flujo de datos
 
@@ -24,14 +25,26 @@ Dependencias: `ui → engine → gp`, `engine → asio`. `gp` y `asio` no depend
                engine.rebuildEvents (+ sincronización) ──▶ eventos en muestras de sesión
                                      │
 driver ASIO ──callback──▶ engine.process: sintetizador + tema + monitor + toma ──▶ salida
-                                     └──▶ ring buffer ──▶ Recorder (goroutine) ──▶ WAV
+                                     ├──▶ ring buffer ──▶ Recorder (goroutine) ──▶ WAV
+                                     └──▶ ring buffer ──▶ UI (a.updateTuner) ──▶ tuner.Detect ──▶ afinador
 ```
+
+## Partitura en pantalla
+
+`ui.TabView` dibuja cada fila (sistema) con el pentagrama arriba y la tablatura debajo; la batería solo lleva pentagrama. Las dos comparten las columnas de tiempo (`tabBar.starts/xs`), así que la nota y su número de traste quedan alineados y el cursor atraviesa ambos.
+
+- `notation.go` es la lógica pura (con tests): clave por pista, ortografía de alturas según la armadura (`gp.MasterBar.Key`), alteraciones por compás y agrupación de barras. Las alturas se escriben una octava por encima de `Note.Key` en guitarra y bajo.
+- `glyphs.go` dibuja los símbolos como trazados vectoriales (Gio no trae fuente musical): cabezas, silencios, claves, alteraciones, corchetes y ligaduras. Todo escala con el espacio del pentagrama (`dpSp`).
+- Posiciones verticales en *pasos*: 0 es la línea inferior y cada paso es medio espacio.
+- `TabView.Zoom` escala todo (`px()` y los tamaños de texto); al cambiarlo se recalcula la distribución.
+- La altura de cada fila se calcula en `rowSpace` según sus notas más agudas o graves; `TabView.above/below` guardan la de la fila que se está dibujando.
 
 ## Hilos: reglas que no se pueden romper
 
 - **Hilo de audio** (`engine.process`, llamado por el driver): no puede bloquearse, esperar a un mutex, hacer E/S ni reservar memoria en cada bloque. Todo su estado vive en `engine.rt`.
 - **Goroutine de UI** (el bucle de eventos de Gio): llama a los métodos exportados de `Engine`. Nunca toca `rt` directamente mientras el audio corre: usa `e.exec(func(*rt){…})`, que encola el cambio y espera a que el hilo de audio lo aplique (con timeout).
 - **Del hilo de audio hacia fuera** solo se comunica con atómicos (`pos`, `playing`, niveles de pico…) y con el ring buffer SPSC de la grabación.
+- **Afinador**: con `Engine.SetTuner(true)` el hilo de audio copia la entrada a un ring SPSC propio (sin bloquear ni reservar memoria). La UI lo vacía en cada fotograma (`Engine.TunerRead`) y estima el tono unas 14 veces por segundo; el hilo de audio no calcula nada.
 - **Driver ASIO**: sus llamadas de control van al hilo COM (STA) propio de `asio.Driver` (`comThread`). Solo puede haber un driver abierto por proceso.
 - **Trabajo lento** (diálogos de archivo, decodificar MP3, panel ASIO): va en una goroutine aparte, que devuelve el resultado a la UI con `a.post(func(){…})`.
 

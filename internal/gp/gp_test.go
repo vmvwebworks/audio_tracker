@@ -27,6 +27,9 @@ func TestFixture(t *testing.T) {
 	if mb := s.MasterBars[3]; mb.Num != 3 || mb.Den != 4 || mb.Duration != 3*gp.TicksPerQuarter {
 		t.Fatalf("compás 4: %+v", mb)
 	}
+	if s.MasterBars[0].Key != 0 || s.MasterBars[1].Key != 2 {
+		t.Fatalf("armadura: %d %d", s.MasterBars[0].Key, s.MasterBars[1].Key)
+	}
 	if s.MasterBars[1].Section != "Estribillo" {
 		t.Fatalf("sección: %q", s.MasterBars[1].Section)
 	}

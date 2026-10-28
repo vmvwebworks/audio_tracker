@@ -15,9 +15,23 @@ Necesitas un driver ASIO para tu tarjeta de sonido; si no tiene uno propio, usa 
 
 ## Pistas
 
-- Haz clic en el nombre de una pista para ver su tablatura. La batería se dibuja en pentagrama.
+- Haz clic en el nombre de una pista para ver su partitura. Cada sistema tiene el **pentagrama** arriba y la **tablatura** debajo, alineados nota a nota. La batería solo lleva pentagrama.
+- El pentagrama dibuja la clave (Sol para guitarra, Fa para bajo, percusión para batería), la armadura, el compás, las figuras con sus plicas, corchetes y barras, los silencios, los puntillos, los tresillos, las ligaduras y las alteraciones. Las notas de guitarra y bajo se escriben una octava por encima de como suenan, como es habitual.
 - **M** silencia la pista, **S** la deja sola y el deslizador ajusta su volumen.
-- **Metrónomo** y **Seguir cursor** están en la barra superior.
+- **Metrónomo**, **Seguir cursor**, **Afinador** y el **zoom** están en la barra superior.
+- Los números de la tablatura van en negrita y negro para leerlos de lejos. Con **−** y **+** (junto al porcentaje) alejas o acercas la partitura entre el 50 % y el 250 %: alejando caben más compases por fila. Se recuerda.
+
+## Afinador
+
+El botón del afinador (a la derecha de *Seguir cursor*) abre una franja bajo la barra de dispositivo. Toca una cuerda al aire por la entrada elegida:
+
+- Se ve la nota, su frecuencia y una aguja que marca los **cents** de desviación (−50 a +50). Verde: afinado (±5 cents); ámbar: cerca; rojo: lejos. El texto indica si hay que subir o aflojar la cuerda.
+- **Instrumento**: con las flechas eliges la afinación: *De la pista* (la de la pista seleccionada, también en afinaciones alternativas), Guitarra, Guitarra Drop D, Guitarra 7 cuerdas, Bajo 4 y 5 cuerdas, Ukelele, Mandolina / Violín, Banjo 5 cuerdas o Cromático (sin cuerdas, mide contra la nota más cercana). Se recuerda el último.
+- Debajo salen las cuerdas del instrumento con su nota; la que suena se ilumina. Pulsa una para **fijarla como objetivo**: la aguja mide contra esa cuerda aunque estés muy lejos de ella. Púlsala otra vez para soltarla.
+- Con una cuerda fijada puedes **cambiar su nota** con *Nota* (medio tono) y *Octava*, por ejemplo para afinar en Re bajo (Drop D) o medio tono abajo. Los cambios de un instrumento se recuerdan; el botón *Restaurar* (aparece junto a los controles cuando cambias una nota) vuelve a la original.
+- **La = 440 Hz** es la referencia; − y + la cambian de 1 en 1 Hz (430 a 450) y se recuerda.
+- Mientras está abierto, la app no libera el audio al pasar a segundo plano. Cierra el afinador con la **X**.
+- No se oye nada por los altavoces: el afinador solo escucha. Si no se mueve, comprueba la entrada y el nivel en la tarjeta **Grabación**.
 
 ## Grabar
 
@@ -74,7 +88,7 @@ La sincronización se guarda por canción. Con el tema cargado, la línea de tie
 
 | Archivo | Contenido |
 |---|---|
-| `%AppData%\audio_tracker\config.json` | Driver, canales, ganancia, monitor, última partitura… |
+| `%AppData%\audio_tracker\config.json` | Driver, canales, ganancia, monitor, La y instrumento del afinador, zoom, última partitura… |
 | `<nombre> - tomas\*.wav` | Tomas (Broadcast WAV) |
 | `<nombre> - tomas\tomas.json` | Favoritas |
 | `<nombre> - tomas\proyecto.json` | Tema cargado y su sincronización |
@@ -84,4 +98,6 @@ La sincronización se guarda por canción. Con el tema cargado, la línea de tie
 - **Formatos**: solo GP7/8 (`.gp`); todavía no `.gp5` ni `.gpx`.
 - **Navegación**: no sigue D.S., D.C. ni Coda (las repeticiones y los finales alternativos, sí).
 - **Efectos**: en la reproducción solo se interpretan la nota muerta, el palm mute, la nota fantasma y el acento.
+- **Partitura**: solo se dibuja la primera voz de cada pista (las demás suenan, pero no se ven); no se dibujan matices (*f*, *p*…), ligaduras de expresión, ni signos de efectos (bends, slides, vibrato). La armadura se lee del archivo; las alteraciones se escriben con sostenidos o bemoles según ella.
+- **Afinador**: detecta una sola nota a la vez (no acordes) entre unos 28 Hz y 1,4 kHz.
 - **Sonido**: sale de una SoundFont General MIDI, no de los sonidos RSE de Guitar Pro.
