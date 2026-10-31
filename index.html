@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Audio Tracker</title>
+<meta name="description" content="Reproduce partituras de Guitar Pro 7/8 con pentagrama y tablatura mientras grabas tu instrumento por ASIO.">
+<meta property="og:title" content="Audio Tracker">
+<meta property="og:description" content="Reproduce partituras de Guitar Pro 7/8 con pentagrama y tablatura mientras grabas tu instrumento por ASIO.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --bg: #f6f3f4; --surface: #ffffff; --ink: #1d1a22; --muted: #6b6470; --line: #e4dde0;
+  --ruby: #a3123a; --ruby-soft: #f7e3e8; --live: #1f7a4d; --live-soft: #e2f2e9;
+  --wip: #8a5a00; --wip-soft: #f7ecd6;
+  --font-display: "Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #15121a; --surface: #1e1a24; --ink: #f1edf2; --muted: #a59eaa; --line: #2f2935;
+    --ruby: #ff5c84; --ruby-soft: #3a1825; --live: #5fd39a; --live-soft: #16301f;
+    --wip: #f0b85a; --wip-soft: #33270f; color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 15px; line-height: 1.55;
+  padding: 48px max(16px, env(safe-area-inset-right, 0px)) 56px max(16px, env(safe-area-inset-left, 0px));
+}
+a { color: var(--ruby); }
+a:focus-visible { outline: 2px solid var(--ruby); outline-offset: 2px; border-radius: 4px; }
+.wrap { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px; }
+h1 { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.03em; line-height: 1; margin: 0; text-wrap: balance; }
+h2 {
+  margin: 0; font-family: var(--font-mono); font-weight: 500; font-size: 11px;
+  text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted);
+  display: flex; align-items: center; gap: 10px;
+}
+h2::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+section { display: flex; flex-direction: column; gap: 12px; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { font-family: var(--font-mono); font-size: 11px; border: 1px solid var(--line); border-radius: 4px; padding: 1px 6px; }
+.chip {
+  font-family: var(--font-mono); font-size: 10.5px; font-weight: 500; text-transform: uppercase;
+  letter-spacing: 0.08em; padding: 3px 8px; border-radius: 999px; white-space: nowrap;
+}
+.chip.public { background: var(--ruby-soft); color: var(--ruby); }
+.chip.live { background: var(--live-soft); color: var(--live); }
+.chip.wip { background: var(--wip-soft); color: var(--wip); }
+.chip.private { color: var(--muted); border: 1px solid var(--line); }
+footer { font-family: var(--font-mono); font-size: 11px; color: var(--muted); letter-spacing: 0.02em; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+.back { font-family: var(--font-mono); font-size: 12px; color: var(--muted); text-decoration: none; }
+.back:hover { color: var(--ruby); }
+header { display: flex; flex-direction: column; gap: 14px; }
+h1 { font-size: clamp(36px, 10vw, 52px); }
+.lead { margin: 0; font-size: 18px; line-height: 1.45; max-width: 46ch; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 10px;
+  font-weight: 500; text-decoration: none; border: 1px solid var(--line); color: var(--ink); background: var(--surface);
+}
+.btn.primary { background: var(--ruby); border-color: var(--ruby); color: var(--bg); }
+.btn:hover { border-color: var(--ruby); }
+ul.points { margin: 0; padding-left: 1.1em; display: flex; flex-direction: column; gap: 8px; }
+ul.points li::marker { color: var(--ruby); }
+code { font-family: var(--font-mono); font-size: 0.9em; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; }
+dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 8px 18px; }
+dt { font-family: var(--font-mono); font-size: 12px; color: var(--muted); padding-top: 2px; }
+dd { margin: 0; min-width: 0; }
+@media (max-width: 420px) { dl { grid-template-columns: 1fr; gap: 2px; } dd { margin-bottom: 8px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="https://vmvwebworks.github.io/">← Marcos</a>
+  <header>
+    <span class="chip public" style="align-self:flex-start">Publicada</span>
+    <h1>Audio Tracker</h1>
+    <p class="lead">Abre partituras de Guitar Pro 7/8, las muestra en pentagrama y tablatura y las hace sonar mientras grabas tu instrumento por ASIO.</p>
+    <div class="tags"><span class="tag">Go</span><span class="tag">Gio</span><span class="tag">Windows</span></div>
+    <div class="actions"><a class="btn primary" href="https://github.com/vmvwebworks/audio_tracker/releases/latest">Descargar para Windows</a><a class="btn" href="https://github.com/vmvwebworks/audio_tracker">Código en GitHub</a><a class="btn" href="https://github.com/vmvwebworks/audio_tracker/blob/main/docs/USO.md">Manual de uso</a></div>
+  </header>
+
+  <section aria-labelledby="h-what">
+    <h2 id="h-what">Qué hace</h2>
+    <ul class="points"><li>Pentagrama y tablatura alineados, con zoom del 50 % al 250 %.</li><li>Suena con un sintetizador General MIDI o sobre el tema real exportado de Reaper, con la partitura sincronizada desde el compás 1.</li><li>Graba por ASIO y guarda cada toma como WAV: se escucha sola o en su sitio dentro de la canción, y se puede marcar como favorita.</li><li>Afinador integrado: guitarra, Drop D, 7 cuerdas, bajo de 4 y 5, ukelele, mandolina, banjo o cromático, con La de 430 a 450 Hz.</li></ul>
+  </section>
+
+  <section aria-labelledby="h-how">
+    <h2 id="h-how">Cómo está hecho</h2>
+    <ul class="points"><li>Go puro, sin cgo: <code>go build</code> genera el <code>.exe</code> completo.</li><li>Interfaz con Gio y síntesis con go-meltysynth. La SoundFont GeneralUser GS va dentro del ejecutable.</li><li>Detección de tono con el algoritmo YIN, de unos 28 Hz a 1,4 kHz.</li><li>Al publicar una versión, GitHub Actions compila el <code>.exe</code> y lo adjunta a la release.</li></ul>
+  </section>
+
+  <section aria-labelledby="h-facts">
+    <h2 id="h-facts">Detalles</h2>
+    <dl><dt>Requisitos</dt><dd>Windows 10/11 de 64 bits y un driver ASIO (vale ASIO4ALL).</dd><dt>Formatos</dt><dd>Solo <code>.gp</code> (GP7/8). Aún no lee <code>.gp5</code> ni <code>.gpx</code>.</dd><dt>Licencia</dt><dd>MIT</dd></dl>
+  </section>
+
+  <footer>Hecho por <a href="https://vmvwebworks.github.io/">Marcos</a> · <a href="https://github.com/vmvwebworks/audio_tracker">github.com/vmvwebworks/audio_tracker</a></footer>
+</div>
+</body>
+</html>
