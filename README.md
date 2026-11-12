@@ -23,6 +23,7 @@ scripts\check.ps1          # formato, vet, tests y compilación
 scripts\run.ps1            # compila y abre la app
 scripts\run.ps1 -Sandbox   # igual, con configuración temporal y partitura de prueba
 scripts\release.ps1        # genera dist\AudioTracker.exe, el que se publica
+go run ./cmd/winres        # tras cambiar assets\icon.ico: regenera el icono del .exe
 ```
 
 Si PowerShell bloquea los scripts: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`. Al crear una versión en GitHub (desde la web o subiendo una etiqueta, con cualquier nombre), GitHub compila el `.exe` y lo adjunta solo (ver [CONTRIBUTING.md](CONTRIBUTING.md#publicar-una-versión)).

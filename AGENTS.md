@@ -16,6 +16,7 @@ Windows desktop app in pure Go (no cgo): plays Guitar Pro 7/8 scores with a Soun
 | Run the app in an isolated sandbox | `scripts\run.ps1 -Sandbox` (prints the PID) |
 | Screenshot / click / type in a window | `scripts\ui.ps1 -ProcessId <PID> -Action shot -Out x.png` |
 | Hardware smoke test (real ASIO driver) | `go run ./cmd/asiotest <file.gp> <outdir>` |
+| Regenerate the app icon resource after changing `assets\icon.ico` | `go run ./cmd/winres` |
 
 Always run `scripts\check.ps1` before saying a change is done, and report its result.
 

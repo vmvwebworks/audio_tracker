@@ -12,6 +12,7 @@
 | `internal/ui` | Interfaz con Gio: ventana, partitura (pentagrama y tablatura), afinador, pistas, tomas y tema | `app.go`, `tab.go`, `notation.go`, `glyphs.go`, `tunerui.go`, `takes.go`, `backing.go` |
 | `internal/testutil` | Fixtures de test (partitura mínima, SoundFont) | |
 | `cmd/asiotest` | Diagnóstico con el driver real: reproduce y graba 3 s en silencio | |
+| `cmd/winres` | Convierte `assets/icon.ico` en `rsrc_windows_amd64.syso` (recurso de Windows, ID 1, que Gio usa también para la ventana). El `.syso` está versionado y `go build` lo enlaza solo | |
 
 Dependencias: `ui → engine → gp`, `engine → asio`, `ui → tuner`. `gp`, `asio` y `tuner` no dependen de nada del proyecto.
 
