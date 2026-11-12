@@ -55,14 +55,16 @@ type Engine struct {
 	rt   rt
 
 	// State published by the audio thread.
-	pos      atomic.Int64 // song position in samples
-	posStamp atomic.Int64 // time.Now().UnixNano() when pos was published
-	playing  atomic.Bool
-	ended    atomic.Bool
-	inPeak   atomic.Uint32
-	feedback atomic.Bool  // monitor was cut by the feedback guard
-	prevPos  atomic.Int64 // preview position in samples, -1 when idle
-	outPeak  atomic.Uint32
+	pos       atomic.Int64 // song position in samples
+	posStamp  atomic.Int64 // time.Now().UnixNano() when pos was published
+	playing   atomic.Bool
+	ended     atomic.Bool
+	inPeak    atomic.Uint32
+	feedback  atomic.Bool  // monitor was cut by the feedback guard
+	prevPos   atomic.Int64 // preview position in samples, -1 when idle
+	outPeak   atomic.Uint32
+	counting  atomic.Bool  // the count-in is running
+	countBeat atomic.Int32 // count-in beats left, the sounding one included
 }
 
 // rt is state owned by the audio thread while the device runs (and by the
@@ -91,7 +93,11 @@ type rt struct {
 	preview      []float32 // a take being auditioned on its own
 	prevPos      int
 	rec          *Recorder
-	tuner        *ring // input tap for the tuner, nil when it is off
+	tuner        *ring   // input tap for the tuner, nil when it is off
+	count        []event // count-in clicks, in samples from its start
+	countIdx     int
+	countPos     int64
+	countLen     int64 // 0 when there is no count-in
 	master       float32
 	inChan       int
 	outL         int
@@ -373,8 +379,10 @@ func (e *Engine) LoadSong(s *gp.Song, tl *gp.Timeline) {
 			e.channels[i] = (drumChannel + 1) % 16
 		}
 	}
+	e.counting.Store(false)
 	e.exec(func(r *rt) {
 		r.playing = false
+		r.stopCountIn()
 		r.pos = 0
 		r.idx = 0
 		r.take = nil
@@ -446,23 +454,7 @@ func (e *Engine) rebuildEvents() {
 
 // Play starts playback from the current position. If a recording was
 // started with StartRecording it captures while playing.
-func (e *Engine) Play() error {
-	if e.song == nil {
-		return errors.New("no hay canción cargada")
-	}
-	if !e.running && e.rt.synth == nil {
-		return errors.New("el audio no está en marcha: revisa el driver ASIO")
-	}
-	e.ended.Store(false)
-	e.exec(func(r *rt) {
-		if r.pos >= r.end {
-			r.pos, r.idx = 0, 0
-		}
-		r.playing = true
-	})
-	e.playing.Store(true)
-	return nil
-}
+func (e *Engine) Play() error { return e.PlayCountIn(0) }
 
 // StartRecording begins a take written to path. If the song is playing,
 // capture starts immediately (punch-in); otherwise it starts with Play.
@@ -497,9 +489,11 @@ func (e *Engine) RecordingElapsed() float64 {
 func (e *Engine) Pause() (*TakeResult, error) {
 	e.exec(func(r *rt) {
 		r.playing = false
+		r.stopCountIn()
 		r.synth.NoteOffAll(false)
 	})
 	e.playing.Store(false)
+	e.counting.Store(false)
 	return e.finishRecording()
 }
 
@@ -572,7 +566,7 @@ func (e *Engine) Position() float64 {
 		return 0
 	}
 	p := float64(e.pos.Load())
-	if e.playing.Load() {
+	if e.playing.Load() && !e.counting.Load() {
 		elapsed := float64(time.Now().UnixNano()-e.posStamp.Load()) / 1e9 * e.sampleRate
 		p += min(max(elapsed, 0), float64(e.bufSize)) - float64(e.latOut)
 	}
@@ -706,14 +700,18 @@ drain:
 	}
 
 	startPos := r.pos
+	lead := 0 // samples of this block spent in the count-in
 	if r.synth == nil {
 		clear(left)
 		clear(right)
 	} else if r.playing {
-		cur := 0
-		for r.idx < len(r.events) && r.events[r.idx].sample < r.pos+int64(n) {
+		if r.countLen > 0 {
+			lead = e.renderCountIn(r, left, right)
+		}
+		cur := lead
+		for r.idx < len(r.events) && r.events[r.idx].sample < r.pos+int64(n-lead) {
 			ev := &r.events[r.idx]
-			if off := int(ev.sample - r.pos); off > cur {
+			if off := lead + int(ev.sample-r.pos); off > cur {
 				r.synth.Render(left[cur:off], right[cur:off])
 				cur = off
 			}
@@ -723,13 +721,13 @@ drain:
 		if cur < n {
 			r.synth.Render(left[cur:], right[cur:])
 		}
-		if r.rec != nil && input != nil {
+		if r.rec != nil && input != nil && lead < n {
 			if r.rec.start.Load() < 0 {
 				r.rec.start.Store(r.pos)
 			}
-			r.rec.q.write(input)
+			r.rec.q.write(input[lead:])
 		}
-		r.pos += int64(n)
+		r.pos += int64(n - lead)
 		if r.pos >= r.end {
 			r.playing = false
 			r.rec = nil
@@ -750,14 +748,14 @@ drain:
 			l += input[i]
 			rr += input[i]
 		}
-		if r.takeOn && r.playing {
-			if p := startPos + int64(i) - r.takeAt; p >= 0 && p < int64(len(r.take)) {
+		if r.takeOn && r.playing && i >= lead {
+			if p := startPos + int64(i-lead) - r.takeAt; p >= 0 && p < int64(len(r.take)) {
 				l += r.take[p]
 				rr += r.take[p]
 			}
 		}
-		if r.backOn && r.playing {
-			if p := startPos + int64(i); p < int64(len(r.backL)) {
+		if r.backOn && r.playing && i >= lead {
+			if p := startPos + int64(i-lead); p < int64(len(r.backL)) {
 				l += r.backL[p] * r.backGain
 				rr += r.backR[p] * r.backGain
 			}

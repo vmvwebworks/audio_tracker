@@ -170,6 +170,78 @@ func TestRenderAndRecord(t *testing.T) {
 	}
 }
 
+// A count-in clicks one bar before the song starts moving, and the take
+// begins exactly where the song does, even when that falls mid-block.
+func TestCountIn(t *testing.T) {
+	e, err := New(testutil.SoundFont(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	s := testutil.Song(t)
+	e.LoadSong(s, gp.NewTimeline(s))
+	const sr, buf = 48000, 1000
+	offline(t, e, sr, buf, 0, 0)
+	const countLen = 4 * 0.6 * sr // a 4/4 bar at 100 bpm: 115200 samples
+
+	in := [][]float32{make([]float32, buf)}
+	out := [][]float32{make([]float32, buf), make([]float32, buf)}
+	k := 0
+	var peak float32
+	block := func() {
+		for i := range in[0] {
+			in[0][i] = float32(k%1000) / 1000
+			k++
+		}
+		e.process(in, out)
+		for _, v := range out[0] {
+			peak = max(peak, v, -v)
+		}
+	}
+
+	if err := e.StartRecording(filepath.Join(t.TempDir(), "cuenta.wav")); err != nil {
+		t.Fatal(err)
+	}
+	if err := e.PlayCountIn(1); err != nil {
+		t.Fatal(err)
+	}
+	if on, beats := e.CountIn(); !on || beats != 4 {
+		t.Fatalf("cuenta: %v, %d tiempos", on, beats)
+	}
+	for range int(countLen) / buf {
+		block()
+	}
+	if e.rt.pos != 0 || e.Position() != 0 || e.recorder.start.Load() >= 0 {
+		t.Fatalf("durante la cuenta la canción avanzó (%d) o se grabó", e.rt.pos)
+	}
+	if on, beats := e.CountIn(); !on || beats != 1 {
+		t.Fatalf("último tiempo: %v, %d", on, beats)
+	}
+	if peak < 0.01 {
+		t.Fatal("la cuenta no suena")
+	}
+	block() // ends the count-in 200 samples in
+	if on, _ := e.CountIn(); on || e.rt.pos != buf-200 {
+		t.Fatalf("tras la cuenta: %v, posición %d", on, e.rt.pos)
+	}
+	block()
+	res, err := e.Pause()
+	if err != nil || res == nil {
+		t.Fatal(res, err)
+	}
+	if e.rt.takeAt != 0 || len(e.rt.take) != 2*buf-200 || e.rt.take[0] != float32(int(countLen)%1000)/1000 {
+		t.Fatalf("toma en %d, %d muestras, primera %v", e.rt.takeAt, len(e.rt.take), e.rt.take[0])
+	}
+
+	// Pausing during the count-in cancels it.
+	e.Seek(0)
+	e.PlayCountIn(2)
+	block()
+	e.Pause()
+	if on, _ := e.CountIn(); on || e.rt.countLen != 0 {
+		t.Fatal("la pausa no canceló la cuenta")
+	}
+}
+
 func TestFeedbackGuard(t *testing.T) {
 	e, err := New(filepath.Join("..", "..", "assets", "GeneralUser-GS.sf2"))
 	if err != nil {
